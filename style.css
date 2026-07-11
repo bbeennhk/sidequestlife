@@ -1,0 +1,762 @@
+/**
+ * style.css
+ * ------------------------------------------------------------------
+ * Daily Side Quest — 樣式總表
+ *
+ * 章節目錄：
+ *   1. Fonts & Reset
+ *   2. Design Tokens（CSS Variables）
+ *   3. 全域背景 / 星空
+ *   4. App Shell（不可捲動的版面容器）
+ *   5. Topbar / Brand
+ *   6. HUD（玩家狀態卡片）
+ *   7. XP 進度條
+ *   8. Quest Window（任務視窗）
+ *   9. Quest Stage（任務舞台：待機 / 任務 / 完成）
+ *  10. Hero（像素角色）
+ *  11. Controls / Buttons
+ *  12. Bottom Grid（歷程卡片，寬螢幕才顯示）
+ *  13. Toast
+ *  14. Level Up Modal
+ *  15. Credit / Footer
+ *  16. Responsive breakpoints
+ *  17. Accessibility（focus / reduced motion）
+ *
+ * 設計原則：
+ *   - 所有顏色一律使用 CSS Variables，禁止寫死色碼。
+ *   - 尺寸一律使用 rem / clamp() / min() / max()，避免固定 px。
+ *   - 沒有重複規則：同一個 selector 的同一個屬性只會被定義一次
+ *     （不同 breakpoint 除外，那是正常的響應式覆寫，而非重複）。
+ * ------------------------------------------------------------------
+ */
+
+/* ==================================================================
+   1. Fonts & Reset
+   ================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Press+Start+2P&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+/* ==================================================================
+   2. Design Tokens
+   ================================================================== */
+:root {
+  /* --- Colors: base --- */
+  --color-bg: #100d24;
+  --color-bg-soft: #18113a;
+  --color-bg-deep: #0b0919;
+  --color-panel: #241d50;
+  --color-panel-2: #302763;
+  --color-panel-3: #171332;
+  --color-window: #211b49;
+  --color-window-2: #2d255f;
+  --color-border: #7168ad;
+  --color-border-soft: #514986;
+  --color-border-faint: #433c73;
+
+  /* --- Colors: text --- */
+  --color-text: #fff7d6;
+  --color-muted: #aaa2cb;
+  --color-ink: #18132e;
+
+  /* --- Colors: accents --- */
+  --color-gold: #ffd76a;
+  --color-gold-dark: #e79d3b;
+  --color-gold-shadow: #69401d;
+  --color-green: #74e6a1;
+  --color-green-dark: #29905a;
+  --color-blue: #78c9ff;
+  --color-blue-dark: #3575b5;
+  --color-pink: #ff8fb3;
+  --color-red: #ff7186;
+  --color-shadow: #090713;
+
+  /* --- Hero sprite colors --- */
+  --color-hero-skin: #ffd1a1;
+  --color-hero-outline: #281b28;
+  --color-hero-hair: #3b2551;
+  --color-hero-body: #6bb8ff;
+  --color-hero-cape: #e85b79;
+  --color-hero-leg: #ded9ff;
+  --color-hero-sword: #dcecff;
+
+  /* --- Fonts --- */
+  --font-pixel: "Press Start 2P", "Noto Sans TC", sans-serif;
+  --font-body: "Noto Sans TC", system-ui, sans-serif;
+
+  /* --- Layout --- */
+  --app-max-width: min(47.5rem, 100%);
+  --border-w: 0.1875rem;      /* 3px  pixel-art border */
+  --border-w-thin: 0.125rem;  /* 2px */
+  --border-w-thick: 0.3125rem;/* 5px */
+
+  /* --- Fluid spacing scale --- */
+  --space-3xs: clamp(0.15rem, 0.3vw, 0.25rem);
+  --space-2xs: clamp(0.25rem, 0.6vw, 0.375rem);
+  --space-xs: clamp(0.375rem, 1vw, 0.5rem);
+  --space-sm: clamp(0.5rem, 1.6vw, 0.75rem);
+  --space-md: clamp(0.625rem, 2vw, 1rem);
+  --space-lg: clamp(0.875rem, 2.6vw, 1.25rem);
+
+  /* --- Fluid type scale --- */
+  --fs-micro: clamp(0.375rem, 1.4vw, 0.5rem);      /* HUD labels */
+  --fs-tiny: clamp(0.4375rem, 1.6vw, 0.5625rem);   /* window title */
+  --fs-sm: clamp(0.5rem, 1.8vw, 0.625rem);         /* kicker / reward */
+  --fs-base: clamp(0.625rem, 2.4vw, 0.75rem);      /* body copy */
+  --fs-md: clamp(0.75rem, 3vw, 0.9375rem);         /* buttons */
+  --fs-lg: clamp(0.875rem, 3.6vw, 1.25rem);        /* HUD value */
+  --fs-xl: clamp(1rem, 3.6vw, 1.1875rem);          /* idle title */
+  --fs-2xl: clamp(1.125rem, 5vw, 1.75rem);         /* quest text */
+  --fs-3xl: clamp(1.25rem, 6vw, 2.25rem);          /* complete title */
+
+  /* --- Motion --- */
+  --ease-pixel: steps(5);
+  --dur-fast: 0.15s;
+  --dur-base: 0.35s;
+}
+
+/* ==================================================================
+   3. 全域背景 / 星空
+   ================================================================== */
+body {
+  min-height: 100svh;
+  overflow-x: hidden;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  background:
+    radial-gradient(circle at 50% -20%, rgba(113, 86, 214, .34), transparent 42%),
+    linear-gradient(180deg, var(--color-bg-soft) 0%, var(--color-bg) 52%, var(--color-bg-deep) 100%);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .26;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .035) 1px, transparent 1px);
+  background-size: 1.5rem 1.5rem;
+  mask-image: linear-gradient(to bottom, #000, transparent 75%);
+}
+
+.sky {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  width: 0.1875rem;
+  height: 0.1875rem;
+  background: #fff4be;
+  box-shadow: 0 0 0.625rem #fff4be;
+  animation: twinkle 2.8s steps(2) infinite;
+}
+.star:nth-child(2n) { animation-delay: .8s; }
+.star:nth-child(3n) { animation-delay: 1.7s; }
+
+@keyframes twinkle {
+  50% { opacity: .25; transform: scale(.7); }
+}
+
+/* ==================================================================
+   4. App Shell — 固定滿版、禁止捲動
+   ================================================================== */
+button { font: inherit; }
+
+.app {
+  width: var(--app-max-width);
+  height: 100svh;
+  margin: auto;
+  padding: max(0.5rem, env(safe-area-inset-top)) 0.625rem max(0.5rem, env(safe-area-inset-bottom));
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ==================================================================
+   5. Topbar / Brand
+   ================================================================== */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+  flex: 0 0 auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5625rem;
+}
+
+.logo-mark {
+  width: 2.375rem;
+  height: 2.375rem;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--color-gold), #ffad47);
+  border: var(--border-w) solid var(--color-text);
+  box-shadow: 0.1875rem 0.1875rem 0 var(--color-gold-shadow);
+  font-size: clamp(1.1875rem, 4vw, 1.4375rem);
+}
+
+.brand-title {
+  font-family: var(--font-pixel);
+  font-size: clamp(0.9375rem, 4.5vw, 1.25rem);
+  line-height: 1.3;
+  color: var(--color-gold);
+  text-shadow: 0.125rem 0.125rem 0 #6b431e;
+}
+
+.brand-sub { display: none; }
+
+.icon-btn {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: var(--border-w) solid var(--color-border);
+  background: var(--color-panel);
+  color: var(--color-text);
+  box-shadow: 0.1875rem 0.1875rem 0 var(--color-shadow);
+  cursor: pointer;
+  font-size: clamp(1rem, 3.5vw, 1.1875rem);
+}
+.icon-btn:active { transform: translate(0.1875rem, 0.1875rem); box-shadow: 0.0625rem 0.0625rem 0 var(--color-shadow); }
+
+/* ==================================================================
+   6. HUD — 玩家狀態卡片
+   ================================================================== */
+.hud {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.3125rem;
+  margin-bottom: var(--space-2xs);
+  flex: 0 0 auto;
+}
+
+.hud-card {
+  min-height: 3.625rem;
+  background: linear-gradient(180deg, var(--color-panel-2), var(--color-panel));
+  border: var(--border-w-thin) solid var(--color-border);
+  box-shadow: 0.1875rem 0.1875rem 0 var(--color-shadow);
+  padding: var(--space-xs) 0.3125rem;
+  position: relative;
+  overflow: hidden;
+}
+.hud-card::after {
+  content: "";
+  position: absolute;
+  right: -0.75rem;
+  bottom: -0.875rem;
+  width: 2.875rem;
+  height: 2.875rem;
+  border: 0.5rem solid rgba(255, 255, 255, .04);
+  transform: rotate(45deg);
+}
+
+.hud-label {
+  font-family: var(--font-pixel);
+  font-size: var(--fs-micro);
+  color: var(--color-muted);
+  line-height: 1.35;
+  white-space: nowrap;
+}
+.hud-value {
+  font-family: var(--font-pixel);
+  font-size: var(--fs-lg);
+  color: var(--color-gold);
+  margin-top: 0.3125rem;
+  line-height: 1.2;
+}
+.hud-mini { display: none; }
+
+/* ==================================================================
+   7. XP 進度條
+   ================================================================== */
+.xp-panel {
+  background: var(--color-panel-3);
+  border: var(--border-w-thin) solid var(--color-border);
+  box-shadow: 0.1875rem 0.1875rem 0 var(--color-shadow);
+  padding: 0.375rem 0.5rem;
+  margin-bottom: var(--space-2xs);
+  flex: 0 0 auto;
+}
+.xp-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  font-size: clamp(0.625rem, 2.6vw, 0.75rem);
+  color: var(--color-muted);
+  margin-bottom: 0.25rem;
+}
+.xp-track {
+  height: clamp(0.6875rem, 2.4vw, 0.875rem);
+  background: #090816;
+  border: var(--border-w-thin) solid var(--color-border-faint);
+  padding: 0.0625rem;
+}
+.xp-fill {
+  height: 100%;
+  width: 0;
+  background: repeating-linear-gradient(90deg, var(--color-green) 0 0.75rem, #55c981 0.75rem 1rem);
+  transition: width .5s steps(12);
+  box-shadow: inset 0 -0.1875rem 0 rgba(0, 0, 0, .18);
+}
+
+/* ==================================================================
+   8. Quest Window
+   ================================================================== */
+.quest-window {
+  position: relative;
+  background: linear-gradient(180deg, var(--color-window-2), var(--color-window));
+  border: var(--border-w) solid var(--color-text);
+  box-shadow: 0.3125rem 0.3125rem 0 var(--color-shadow);
+  padding: var(--space-xs);
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.quest-window::before {
+  content: "";
+  position: absolute;
+  inset: 0.5rem;
+  border: var(--border-w-thin) solid rgba(255, 255, 255, .09);
+  pointer-events: none;
+}
+
+.window-bar {
+  min-height: 1.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  background: #17132f;
+  border: var(--border-w-thin) solid var(--color-border-soft);
+  padding: 0.3125rem 0.5rem;
+  margin-bottom: var(--space-2xs);
+  flex: 0 0 auto;
+}
+.window-title {
+  font-family: var(--font-pixel);
+  font-size: var(--fs-tiny);
+  color: var(--color-gold);
+  line-height: 1.35;
+  letter-spacing: .02em;
+}
+.window-date { font-size: clamp(0.5625rem, 2vw, 0.625rem); color: var(--color-muted); }
+
+/* ==================================================================
+   9. Quest Stage
+   ================================================================== */
+.quest-stage {
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background:
+    linear-gradient(rgba(10, 8, 27, .3), rgba(10, 8, 27, .8)),
+    linear-gradient(180deg, #31266a 0 54%, #1b163d 54% 100%);
+  border: var(--border-w) solid #0b0918;
+  box-shadow: inset 0 0 0 0.1875rem #4c4381;
+  flex: 1 1 auto;
+}
+.quest-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 49%, rgba(255, 255, 255, .04) 50%, transparent 51%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, .02) 0 0.125rem, transparent 0.125rem 0.3125rem);
+  pointer-events: none;
+}
+
+.mountains {
+  position: absolute;
+  inset: auto 0 2.25rem;
+  height: 5rem;
+  opacity: .62;
+  background:
+    linear-gradient(135deg, transparent 35%, #3a326d 36% 56%, transparent 57%) 0 0/10.625rem 5.625rem repeat-x,
+    linear-gradient(45deg, transparent 38%, #282252 39% 58%, transparent 59%) 3.4375rem 0.625rem/11.875rem 5.125rem repeat-x;
+}
+.ground {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 2.375rem;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, .04) 1px, transparent 1px) 0 0/1.25rem 1.25rem,
+    linear-gradient(#2b244f, #17132f);
+  border-top: var(--border-w-thin) solid var(--color-border-soft);
+}
+
+/* ---- 待機 / 任務 / 完成 內容區 ---- */
+.idle-content,
+.quest-content,
+.complete-content {
+  position: relative;
+  z-index: 2;
+  width: min(42.5rem, 94%);
+  padding: var(--space-sm) 0.5rem;
+}
+.idle-content[hidden],
+.quest-content[hidden],
+.complete-content[hidden] { display: none; }
+
+.idle-title {
+  font-family: var(--font-pixel);
+  font-size: var(--fs-xl);
+  line-height: 1.45;
+  color: var(--color-text);
+}
+.idle-copy {
+  color: var(--color-muted);
+  font-size: var(--fs-base);
+  line-height: 1.5;
+  margin-top: var(--space-2xs);
+}
+.press-start {
+  color: var(--color-gold);
+  animation: blink 1s steps(2) infinite;
+}
+@keyframes blink { 50% { opacity: .25; } }
+
+.quest-kicker {
+  display: inline-block;
+  font-family: var(--font-pixel);
+  font-size: var(--fs-sm);
+  line-height: 1.3;
+  color: var(--color-ink);
+  background: var(--color-gold);
+  padding: 0.3125rem 0.4375rem;
+  border: var(--border-w-thin) solid var(--color-text);
+  box-shadow: 0.1875rem 0.1875rem 0 #79511f;
+  margin-bottom: var(--space-sm);
+}
+.quest-text {
+  font-size: var(--fs-2xl);
+  line-height: 1.42;
+  font-weight: 900;
+  text-shadow: 0 0.1875rem 0 rgba(0, 0, 0, .35);
+  animation: questIn .35s steps(5);
+}
+@keyframes questIn {
+  from { opacity: 0; transform: scale(.88) translateY(0.75rem); }
+  to { opacity: 1; transform: none; }
+}
+.quest-reward {
+  margin-top: var(--space-sm);
+  color: var(--color-gold);
+  font-family: var(--font-pixel);
+  font-size: var(--fs-sm);
+  line-height: 1.4;
+}
+
+.complete-burst {
+  font-size: clamp(2rem, 8vw, 2.75rem);
+  animation: burst .55s steps(6);
+}
+@keyframes burst {
+  from { transform: scale(.2) rotate(-20deg); }
+  to { transform: scale(1) rotate(0); }
+}
+.complete-title {
+  font-family: var(--font-pixel);
+  font-size: var(--fs-3xl);
+  color: var(--color-green);
+  line-height: 1.5;
+}
+.complete-copy {
+  color: var(--color-muted);
+  margin-top: var(--space-2xs);
+  font-size: var(--fs-base);
+}
+
+/* ==================================================================
+   10. Hero（像素角色）
+   ================================================================== */
+.hero {
+  width: 3.625rem;
+  height: 4.5rem;
+  position: relative;
+  margin: 0 auto var(--space-sm);
+  image-rendering: pixelated;
+  animation: heroFloat 1.8s steps(2) infinite;
+  transform: scale(.82);
+}
+@keyframes heroFloat { 50% { transform: translateY(-0.3125rem); } }
+
+.hero .head  { position: absolute; left: 1.375rem; top: 0.25rem; width: 2.125rem; height: 1.875rem; background: var(--color-hero-skin); border: var(--border-w-thin) solid var(--color-hero-outline); }
+.hero .hair  { position: absolute; left: 1.125rem; top: 0; width: 2.625rem; height: 1.125rem; background: var(--color-hero-hair); border: var(--border-w-thin) solid var(--color-hero-outline); }
+.hero .body  { position: absolute; left: 1.0625rem; top: 2.125rem; width: 2.75rem; height: 2.25rem; background: var(--color-hero-body); border: var(--border-w-thin) solid var(--color-hero-outline); }
+.hero .cape  { position: absolute; left: 0.5rem; top: 2.4375rem; width: 1.4375rem; height: 2.4375rem; background: var(--color-hero-cape); border: var(--border-w-thin) solid var(--color-hero-outline); }
+.hero .leg1,
+.hero .leg2  { position: absolute; top: 4.1875rem; width: 0.875rem; height: 1.5rem; background: var(--color-hero-leg); border: var(--border-w-thin) solid var(--color-hero-outline); }
+.hero .leg1  { left: 1.25rem; }
+.hero .leg2  { right: 1.0625rem; }
+.hero .sword {
+  position: absolute; right: 0; top: 2.1875rem;
+  width: 0.5625rem; height: 2.9375rem;
+  background: var(--color-hero-sword);
+  border: 0.1875rem solid var(--color-hero-outline);
+  transform: rotate(21deg);
+}
+.hero .sword::after {
+  content: "";
+  position: absolute; left: -0.4375rem; top: 1.625rem;
+  width: 1.1875rem; height: 0.4375rem;
+  background: var(--color-gold);
+  border: 0.1875rem solid var(--color-hero-outline);
+}
+
+/* ==================================================================
+   11. Controls / Buttons
+   ================================================================== */
+.controls {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+  flex: 0 0 auto;
+}
+
+.game-btn {
+  min-height: 3.25rem;
+  border: var(--border-w) solid var(--color-text);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 900;
+  font-size: var(--fs-md);
+  line-height: 1.2;
+  letter-spacing: .01em;
+  color: var(--color-ink);
+  padding: 0.5625rem 0.3125rem;
+  white-space: nowrap;
+  transition: transform var(--dur-fast), filter var(--dur-fast);
+}
+.game-btn:hover { filter: brightness(1.08); }
+.game-btn:active { transform: translateY(0.3125rem); }
+.game-btn[hidden] { display: none; }
+
+.game-btn.primary { background: var(--color-gold);  box-shadow: 0 0.4375rem 0 var(--color-gold-dark); }
+.game-btn.blue    { background: var(--color-blue);  box-shadow: 0 0.4375rem 0 var(--color-blue-dark); }
+.game-btn.green   { background: var(--color-green); box-shadow: 0 0.4375rem 0 var(--color-green-dark); }
+.game-btn.dark    { background: #3b3368; color: var(--color-text); box-shadow: 0 0.4375rem 0 #17132e; }
+
+@media (min-width: 42.5rem) {
+  .controls.active { grid-template-columns: 1fr 1fr 1fr; }
+}
+@media (max-width: 42.4375rem) {
+  .controls.active { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+/* ==================================================================
+   12. Bottom Grid（寬螢幕才顯示的歷程卡片，預設隱藏以確保不捲動）
+   ================================================================== */
+.bottom-grid { display: none; }
+
+.info-card {
+  background: var(--color-panel);
+  border: var(--border-w) solid var(--color-border);
+  box-shadow: 0.3125rem 0.3125rem 0 var(--color-shadow);
+  padding: var(--space-lg);
+}
+.info-title {
+  font-family: var(--font-pixel);
+  font-size: var(--fs-sm);
+  color: var(--color-gold);
+  line-height: 1.6;
+}
+.info-text {
+  font-size: var(--fs-base);
+  color: var(--color-muted);
+  line-height: 1.7;
+  margin-top: var(--space-xs);
+}
+.mini-log {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+  margin-top: var(--space-sm);
+}
+.log-dot {
+  width: 1.125rem;
+  height: 1.125rem;
+  background: #3d365f;
+  border: var(--border-w-thin) solid var(--color-border);
+}
+.log-dot.done {
+  background: var(--color-green);
+  border-color: #c4ffd8;
+  box-shadow: 0 0 0.625rem rgba(116, 230, 161, .35);
+}
+
+.footer { display: none; }
+
+/* ==================================================================
+   13. Toast
+   ================================================================== */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1.5625rem + env(safe-area-inset-bottom));
+  transform: translate(-50%, 1.875rem);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+  background: var(--color-text);
+  color: var(--color-ink);
+  border: 0.25rem solid var(--color-ink);
+  box-shadow: 0.375rem 0.375rem 0 #000;
+  padding: 0.75rem 1.125rem;
+  font-family: var(--font-pixel);
+  font-size: var(--fs-sm);
+  transition: .22s;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ==================================================================
+   14. Level Up Modal
+   ================================================================== */
+.level-up {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 6, 20, .82);
+  display: grid;
+  place-items: center;
+  z-index: 30;
+  padding: 1.25rem;
+}
+.level-up[hidden] { display: none; }
+
+.level-box {
+  text-align: center;
+  background: var(--color-panel-2);
+  border: 0.3125rem solid var(--color-gold);
+  box-shadow: 0.625rem 0.625rem 0 #000;
+  padding: 1.875rem;
+  width: min(26.25rem, 100%);
+  animation: questIn .35s steps(5);
+}
+.level-box .big { font-size: clamp(2.5rem, 10vw, 4rem); }
+.level-box h2 {
+  font-family: var(--font-pixel);
+  color: var(--color-gold);
+  font-size: clamp(1rem, 4vw, 1.25rem);
+  line-height: 1.7;
+}
+.level-box p { color: var(--color-muted); }
+
+/* ==================================================================
+   15. Credit / Footer
+   ================================================================== */
+.settings-credit {
+  width: 100%;
+  text-align: center;
+  margin-top: var(--space-2xs);
+  margin-bottom: 0.125rem;
+  font-size: clamp(0.5rem, 1.8vw, 0.5625rem);
+  line-height: 1.2;
+  opacity: .45;
+  user-select: none;
+}
+.settings-credit a {
+  color: #9d97be;
+  text-decoration: none;
+  transition: .2s;
+}
+.settings-credit a:hover { color: var(--color-gold); opacity: 1; }
+.settings-credit a:visited { color: #9d97be; }
+
+/* ==================================================================
+   16. Responsive breakpoints
+   ------------------------------------------------------------------
+   兩個維度各自處理一次，不重複覆寫同一屬性：
+     - 寬度斷點：調整版面欄數 / 字級曲線的上限
+     - 高度斷點：畫面太矮時，優先犧牲裝飾元素（英雄圖、跑馬燈文字）
+       以確保「不出現捲軸」這個硬性需求
+   ================================================================== */
+@media (max-width: 45rem) {
+  .hud { grid-template-columns: 1fr 1fr; }
+  .bottom-grid { grid-template-columns: 1fr; }
+  .topbar { align-items: flex-start; }
+  .logo-mark { width: 2.875rem; height: 2.875rem; font-size: clamp(1.25rem, 5vw, 1.4375rem); }
+}
+
+@media (max-width: 26.875rem) {
+  .app { padding-left: 0.625rem; padding-right: 0.625rem; }
+  .quest-window { padding: 0.625rem; }
+  .window-date { display: none; }
+}
+
+@media (max-width: 24.375rem) {
+  .app { padding-left: 0.4375rem; padding-right: 0.4375rem; }
+  .hud { gap: 0.25rem; }
+  .hud-card { padding: 0.375rem 0.25rem; min-height: 3.125rem; }
+}
+
+/* 極矮螢幕（landscape 手機、切成小視窗的桌機）：讓版面主動收縮 */
+@media (max-height: 43.75rem) and (orientation: landscape) {
+  .app { width: min(68.75rem, 100%); }
+  .hero { transform: scale(.75); margin-bottom: var(--space-2xs); }
+  .idle-content, .quest-content, .complete-content { padding: var(--space-md); }
+}
+
+@media (max-height: 46.25rem) {
+  .topbar { margin-bottom: var(--space-2xs); }
+  .hud { margin-bottom: var(--space-2xs); }
+  .xp-panel { margin-bottom: var(--space-2xs); }
+  .quest-window { padding: var(--space-2xs); }
+  .window-bar { margin-bottom: 0.25rem; }
+  .hero { margin-bottom: 0.25rem; transform: scale(.68); }
+  .idle-content, .quest-content, .complete-content { padding: var(--space-2xs); }
+  .press-start { display: none; }
+}
+
+@media (max-height: 40.625rem) {
+  .hud-card { min-height: 2.8125rem; }
+  .xp-panel { padding: 0.25rem 0.375rem; }
+  .xp-row { margin-bottom: 0.125rem; }
+  .window-bar { min-height: 1.5625rem; }
+  .hero { display: none; }
+  .idle-copy br { display: none; }
+  .game-btn { min-height: 2.5rem; padding: 0.375rem; }
+}
+
+/* ==================================================================
+   17. Accessibility
+   ================================================================== */
+button:focus-visible {
+  outline: 0.25rem solid var(--color-blue);
+  outline-offset: 0.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
