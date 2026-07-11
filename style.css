@@ -82,14 +82,21 @@ body {
   --color-red: #ff7186;
   --color-shadow: #090713;
 
-  /* --- Hero sprite colors --- */
-  --color-hero-skin: #ffd1a1;
-  --color-hero-outline: #281b28;
-  --color-hero-hair: #3b2551;
-  --color-hero-body: #6bb8ff;
-  --color-hero-cape: #e85b79;
-  --color-hero-leg: #ded9ff;
-  --color-hero-sword: #dcecff;
+  /* --- Hero mascot colors（可愛版角色，僅供 .hero svg 使用） --- */
+  --color-hero-outline: #2b2140;
+  --color-hero-skin: #ffdfb8;
+  --color-hero-hair: #5b3d82;
+  --color-hero-hair-back: #4a2f6b;
+  --color-hero-hair-light: #7c5aa6;
+  --color-hero-body: #7cc6ff;
+  --color-hero-body-shadow: #58a6e8;
+  --color-hero-cape: #ff8fb3;
+  --color-hero-cape-shadow: #c2477e;
+  --color-hero-shorts: #3b2551;
+  --color-hero-leg: #4a3168;
+  --color-hero-blush: #ff9eb0;
+  --color-hero-sword: #eaf6ff;
+  --color-hero-sword-shade: #c9def0;
 
   /* --- Fonts --- */
   --font-pixel: "Press Start 2P", "Noto Sans TC", sans-serif;
@@ -496,41 +503,37 @@ button { font: inherit; }
 }
 
 /* ==================================================================
-   10. Hero（像素角色）
+   10. Hero（劍圖示）
    ================================================================== */
-.hero {
-  width: 3.625rem;
-  height: 4.5rem;
-  position: relative;
-  margin: 0 auto var(--space-sm);
-  image-rendering: pixelated;
-  animation: heroFloat 1.8s steps(2) infinite;
-  transform: scale(.82);
+.hero{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:clamp(4.5rem,16vw,6rem);
+  height:clamp(4.5rem,16vw,6rem);
+  margin:0 auto var(--space-sm);
+  font-size:clamp(3.5rem,12vw,5rem);
+  line-height:1;
+  animation:heroFloat 2.2s ease-in-out infinite;
+  filter:drop-shadow(0 0.25rem 0 #6b431e) drop-shadow(0 0 0.75rem rgba(255,215,106,.45));
+  text-shadow:0.1875rem 0.1875rem 0 #5a3818,0 0 0.75rem rgba(255,215,106,.5);
 }
-@keyframes heroFloat { 50% { transform: translateY(-0.3125rem); } }
+@keyframes heroFloat{
+50%{transform:translateY(-0.375rem);}
+}
+/* 劍尖的兩顆小星星，交錯閃爍，呼應整體 Pixel Sparkle 風格 */
+.hero-sparkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: heroSparkle 1.6s ease-in-out infinite;
+}
+.hero-sparkle:nth-of-type(2) { animation-delay: .55s; }
+@keyframes heroSparkle {
+  0%, 100% { opacity: .9; transform: scale(1); }
+  50% { opacity: .15; transform: scale(.35); }
+}
 
-.hero .head  { position: absolute; left: 1.375rem; top: 0.25rem; width: 2.125rem; height: 1.875rem; background: var(--color-hero-skin); border: var(--border-w-thin) solid var(--color-hero-outline); }
-.hero .hair  { position: absolute; left: 1.125rem; top: 0; width: 2.625rem; height: 1.125rem; background: var(--color-hero-hair); border: var(--border-w-thin) solid var(--color-hero-outline); }
-.hero .body  { position: absolute; left: 1.0625rem; top: 2.125rem; width: 2.75rem; height: 2.25rem; background: var(--color-hero-body); border: var(--border-w-thin) solid var(--color-hero-outline); }
-.hero .cape  { position: absolute; left: 0.5rem; top: 2.4375rem; width: 1.4375rem; height: 2.4375rem; background: var(--color-hero-cape); border: var(--border-w-thin) solid var(--color-hero-outline); }
-.hero .leg1,
-.hero .leg2  { position: absolute; top: 4.1875rem; width: 0.875rem; height: 1.5rem; background: var(--color-hero-leg); border: var(--border-w-thin) solid var(--color-hero-outline); }
-.hero .leg1  { left: 1.25rem; }
-.hero .leg2  { right: 1.0625rem; }
-.hero .sword {
-  position: absolute; right: 0; top: 2.1875rem;
-  width: 0.5625rem; height: 2.9375rem;
-  background: var(--color-hero-sword);
-  border: 0.1875rem solid var(--color-hero-outline);
-  transform: rotate(21deg);
-}
-.hero .sword::after {
-  content: "";
-  position: absolute; left: -0.4375rem; top: 1.625rem;
-  width: 1.1875rem; height: 0.4375rem;
-  background: var(--color-gold);
-  border: 0.1875rem solid var(--color-hero-outline);
-}
+
 
 /* ==================================================================
    11. Controls / Buttons
@@ -721,7 +724,7 @@ button { font: inherit; }
 /* 極矮螢幕（landscape 手機、切成小視窗的桌機）：讓版面主動收縮 */
 @media (max-height: 43.75rem) and (orientation: landscape) {
   .app { width: min(68.75rem, 100%); }
-  .hero { transform: scale(.75); margin-bottom: var(--space-2xs); }
+  .hero { width: clamp(2.75rem, 10vw, 3.5rem); margin-bottom: var(--space-2xs); }
   .idle-content, .quest-content, .complete-content { padding: var(--space-md); }
 }
 
@@ -731,7 +734,7 @@ button { font: inherit; }
   .xp-panel { margin-bottom: var(--space-2xs); }
   .quest-window { padding: var(--space-2xs); }
   .window-bar { margin-bottom: 0.25rem; }
-  .hero { margin-bottom: 0.25rem; transform: scale(.68); }
+  .hero { margin-bottom: 0.25rem; width: clamp(2.5rem, 9vw, 3.25rem); }
   .idle-content, .quest-content, .complete-content { padding: var(--space-2xs); }
   .press-start { display: none; }
 }
