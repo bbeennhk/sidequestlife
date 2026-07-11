@@ -7,543 +7,13 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Daily Side Quest｜每日支線任務</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Press+Start+2P&display=swap');
 
-:root{
-  --bg:#100d24;
-  --bg2:#1a1440;
-  --panel:#241d50;
-  --panel2:#302763;
-  --panel3:#171332;
-  --line:#7168ad;
-  --text:#fff7d6;
-  --muted:#aaa2cb;
-  --gold:#ffd76a;
-  --gold2:#e79d3b;
-  --green:#74e6a1;
-  --green2:#29905a;
-  --blue:#78c9ff;
-  --blue2:#3575b5;
-  --pink:#ff8fb3;
-  --red:#ff7186;
-  --shadow:#090713;
-  --pixel:"Press Start 2P","Noto Sans TC",sans-serif;
-  --body:"Noto Sans TC",system-ui,sans-serif;
-}
-
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:var(--body)}
-body{
-  min-height:100svh;
-  overflow-x:hidden;
-  background:
-    radial-gradient(circle at 50% -20%,rgba(113,86,214,.34),transparent 42%),
-    linear-gradient(180deg,#18113a 0%,#100d24 52%,#0b0919 100%);
-}
-body::before{
-  content:"";
-  position:fixed;inset:0;pointer-events:none;opacity:.26;
-  background-image:
-    linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
-  background-size:24px 24px;
-  mask-image:linear-gradient(to bottom,#000,transparent 75%);
-}
-button{font:inherit}
-button:focus-visible{outline:4px solid var(--blue);outline-offset:4px}
-
-.sky{
-  position:fixed;inset:0;pointer-events:none;overflow:hidden;
-}
-.star{position:absolute;width:3px;height:3px;background:#fff4be;box-shadow:0 0 10px #fff4be;animation:twinkle 2.8s steps(2) infinite}
-.star:nth-child(2n){animation-delay:.8s}
-.star:nth-child(3n){animation-delay:1.7s}
-@keyframes twinkle{50%{opacity:.25;transform:scale(.7)}}
-
-.app{
-  width:min(760px,100%);
-  height:100svh;
-  margin:auto;
-  padding:max(8px,env(safe-area-inset-top)) 10px max(8px,env(safe-area-inset-bottom));
-  position:relative;
-  z-index:1;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-}
-
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  margin-bottom:8px;flex:0 0 auto;
-}
-.brand{display:flex;align-items:center;gap:9px}
-.logo-mark{
-  width:38px;height:38px;display:grid;place-items:center;
-  background:linear-gradient(135deg,var(--gold),#ffad47);
-  border:3px solid var(--text);
-  box-shadow:3px 3px 0 #69401d;
-  font-size:19px;
-}
-.brand-title{
-  font-family:var(--pixel);
-  font-size:clamp(10px,3vw,15px);
-  line-height:1.35;color:var(--gold);
-  text-shadow:2px 2px 0 #6b431e;
-}
-.brand-sub{display:none}
-.icon-btn{
-  width:38px;height:38px;border:3px solid var(--line);background:var(--panel);
-  color:var(--text);box-shadow:3px 3px 0 var(--shadow);cursor:pointer;font-size:16px;
-}
-.icon-btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--shadow)}
-
-.hud{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:7px;
-  flex:0 0 auto;
-}
-.hud-card{
-  min-height:54px;background:linear-gradient(180deg,var(--panel2),var(--panel));
-  border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);
-  padding:7px 6px;position:relative;overflow:hidden;
-}
-.hud-card::after{
-  content:"";position:absolute;right:-12px;bottom:-14px;width:46px;height:46px;
-  border:8px solid rgba(255,255,255,.04);transform:rotate(45deg);
-}
-.hud-label{font-family:var(--pixel);font-size:5.8px;color:var(--muted);line-height:1.35}
-.hud-value{font-family:var(--pixel);font-size:10px;color:var(--gold);margin-top:5px;line-height:1.2}
-.hud-mini{display:none}
-
-.xp-panel{
-  background:var(--panel3);border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);
-  padding:6px 8px;margin-bottom:7px;flex:0 0 auto;
-}
-.xp-row{display:flex;justify-content:space-between;gap:8px;font-size:9px;color:var(--muted);margin-bottom:4px}
-.xp-track{height:11px;background:#090816;border:2px solid #433c73;padding:1px}
-.xp-fill{
-  height:100%;width:0;background:repeating-linear-gradient(90deg,var(--green) 0 12px,#55c981 12px 16px);
-  transition:width .5s steps(12);
-  box-shadow:inset 0 -3px 0 rgba(0,0,0,.18);
-}
-
-.quest-window{
-  position:relative;
-  background:linear-gradient(180deg,#2d255f,#211b49);
-  border:3px solid var(--text);
-  box-shadow:5px 5px 0 var(--shadow);
-  padding:8px;
-  flex:1 1 auto;
-  min-height:0;
-  display:flex;
-  flex-direction:column;
-}
-.quest-window::before{
-  content:"";position:absolute;inset:8px;border:2px solid rgba(255,255,255,.09);pointer-events:none;
-}
-.window-bar{
-  min-height:30px;display:flex;align-items:center;justify-content:space-between;gap:8px;
-  background:#17132f;border:2px solid #514986;padding:5px 8px;margin-bottom:6px;
-  flex:0 0 auto;
-}
-.window-title{font-family:var(--pixel);font-size:6.5px;color:var(--gold);line-height:1.35}
-.window-date{font-size:9px;color:var(--muted)}
-
-.quest-stage{
-  min-height:0;position:relative;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;text-align:center;
-  background:
-    linear-gradient(rgba(10,8,27,.3),rgba(10,8,27,.8)),
-    linear-gradient(180deg,#31266a 0 54%,#1b163d 54% 100%);
-  border:3px solid #0b0918;
-  box-shadow:inset 0 0 0 3px #4c4381;
-  flex:1 1 auto;
-}
-.quest-stage::before{
-  content:"";position:absolute;inset:0;
-  background:
-    linear-gradient(90deg,transparent 49%,rgba(255,255,255,.04) 50%,transparent 51%),
-    repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 2px,transparent 2px 5px);
-  pointer-events:none;
-}
-.mountains{
-  position:absolute;inset:auto 0 36px;height:80px;opacity:.62;
-  background:
-    linear-gradient(135deg,transparent 35%,#3a326d 36% 56%,transparent 57%) 0 0/170px 90px repeat-x,
-    linear-gradient(45deg,transparent 38%,#282252 39% 58%,transparent 59%) 55px 10px/190px 82px repeat-x;
-}
-.ground{
-  position:absolute;left:0;right:0;bottom:0;height:38px;
-  background:
-    linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px) 0 0/20px 20px,
-    linear-gradient(#2b244f,#17132f);
-  border-top:3px solid #514986;
-}
-
-.hero{
-  width:58px;height:72px;position:relative;margin:0 auto 10px;image-rendering:pixelated;
-  animation:heroFloat 1.8s steps(2) infinite;
-  transform:scale(.82);
-}
-@keyframes heroFloat{50%{transform:translateY(-5px)}}
-.hero .head{position:absolute;left:22px;top:4px;width:34px;height:30px;background:#ffd1a1;border:4px solid #281b28}
-.hero .hair{position:absolute;left:18px;top:0;width:42px;height:18px;background:#3b2551;border:4px solid #281b28}
-.hero .body{position:absolute;left:17px;top:34px;width:44px;height:36px;background:#6bb8ff;border:4px solid #281b28}
-.hero .cape{position:absolute;left:8px;top:39px;width:23px;height:39px;background:#e85b79;border:4px solid #281b28}
-.hero .leg1,.hero .leg2{position:absolute;top:67px;width:14px;height:24px;background:#ded9ff;border:4px solid #281b28}
-.hero .leg1{left:20px}.hero .leg2{right:17px}
-.hero .sword{position:absolute;right:0;top:35px;width:9px;height:47px;background:#dcecff;border:3px solid #281b28;transform:rotate(21deg)}
-.hero .sword::after{content:"";position:absolute;left:-7px;top:26px;width:19px;height:7px;background:var(--gold);border:3px solid #281b28}
-
-.idle-content,.quest-content,.complete-content{position:relative;z-index:2;width:min(680px,94%);padding:10px 8px}
-.idle-title{
-  font-family:var(--pixel);font-size:clamp(10px,3.5vw,15px);line-height:1.45;color:var(--text);
-}
-.idle-copy{color:var(--muted);font-size:11px;line-height:1.5;margin-top:5px}
-.press-start{color:var(--gold);animation:blink 1s steps(2) infinite}
-@keyframes blink{50%{opacity:.25}}
-
-.quest-content[hidden],.idle-content[hidden],.complete-content[hidden]{display:none}
-.quest-kicker{
-  display:inline-block;font-family:var(--pixel);font-size:6px;line-height:1.3;
-  color:#1b1734;background:var(--gold);padding:5px 7px;border:2px solid var(--text);
-  box-shadow:3px 3px 0 #79511f;margin-bottom:10px;
-}
-.quest-text{
-  font-size:clamp(18px,5.5vw,28px);line-height:1.4;font-weight:900;
-  text-shadow:0 3px 0 rgba(0,0,0,.35);
-  animation:questIn .35s steps(5);
-}
-@keyframes questIn{
-  from{opacity:0;transform:scale(.88) translateY(12px)}
-  to{opacity:1;transform:none}
-}
-.quest-reward{margin-top:10px;color:var(--gold);font-family:var(--pixel);font-size:6.5px;line-height:1.4}
-
-.complete-burst{font-size:44px;animation:burst .55s steps(6)}
-@keyframes burst{from{transform:scale(.2) rotate(-20deg)}to{transform:scale(1) rotate(0)}}
-.complete-title{font-family:var(--pixel);font-size:clamp(12px,4vw,18px);color:var(--green);line-height:1.5}
-.complete-copy{color:var(--muted);margin-top:5px;font-size:11px}
-
-.controls{
-  display:grid;grid-template-columns:1fr;gap:7px;margin-top:7px;
-  flex:0 0 auto;
-}
-.game-btn{
-  min-height:42px;border:3px solid var(--text);cursor:pointer;
-  font-family:var(--pixel);font-size:8px;line-height:1.35;
-  color:#171329;padding:8px 10px;
-  transition:transform .06s,filter .15s;
-}
-.game-btn:hover{filter:brightness(1.08)}
-.game-btn:active{transform:translateY(5px)}
-.game-btn.primary{background:var(--gold);box-shadow:0 7px 0 var(--gold2)}
-.game-btn.blue{background:var(--blue);box-shadow:0 7px 0 var(--blue2)}
-.game-btn.green{background:var(--green);box-shadow:0 7px 0 var(--green2)}
-.game-btn.dark{background:#3b3368;color:var(--text);box-shadow:0 7px 0 #17132e}
-.game-btn[hidden]{display:none}
-
-.bottom-grid{display:none}
-.info-card{
-  background:var(--panel);border:3px solid var(--line);box-shadow:5px 5px 0 var(--shadow);
-  padding:14px;
-}
-.info-title{font-family:var(--pixel);font-size:8px;color:var(--gold);line-height:1.6}
-.info-text{font-size:12px;color:var(--muted);line-height:1.7;margin-top:8px}
-.mini-log{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.log-dot{width:18px;height:18px;background:#3d365f;border:2px solid #7168ad}
-.log-dot.done{background:var(--green);border-color:#c4ffd8;box-shadow:0 0 10px rgba(116,230,161,.35)}
-
-.footer{display:none}
-
-.toast{
-  position:fixed;left:50%;bottom:calc(25px + env(safe-area-inset-bottom));
-  transform:translate(-50%,30px);opacity:0;pointer-events:none;z-index:20;
-  background:var(--text);color:#18132e;border:4px solid #18132e;
-  box-shadow:6px 6px 0 #000;padding:12px 18px;font-family:var(--pixel);font-size:9px;
-  transition:.22s;
-}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-
-.level-up{
-  position:fixed;inset:0;background:rgba(8,6,20,.82);display:grid;place-items:center;
-  z-index:30;padding:20px;
-}
-.level-up[hidden]{display:none}
-.level-box{
-  text-align:center;background:var(--panel2);border:5px solid var(--gold);
-  box-shadow:10px 10px 0 #000;padding:30px;width:min(420px,100%);
-  animation:questIn .35s steps(5);
-}
-.level-box .big{font-size:64px}
-.level-box h2{font-family:var(--pixel);color:var(--gold);font-size:20px;line-height:1.7}
-.level-box p{color:var(--muted)}
-
-@media(min-width:680px){
-  .controls.active{grid-template-columns:1fr 1fr 1fr}
-}
-}
-@media(max-width:720px){
-  .hud{grid-template-columns:1fr 1fr}
-  .bottom-grid{grid-template-columns:1fr}
-  .topbar{align-items:flex-start}
-  .logo-mark{width:46px;height:46px;font-size:23px}
-  .quest-stage{min-height:335px}
-}
-@media(max-width:430px){
-  .app{padding-left:10px;padding-right:10px}
-  .brand-sub{display:none}
-  .hud-card{min-height:70px}
-  .hud-value{font-size:14px}
-  .quest-window{padding:10px}
-  .window-date{display:none}
-  .quest-stage{min-height:330px}
-  .quest-text{font-size:25px}
-}
-@media(max-height:700px) and (orientation:landscape){
-  .app{width:min(1100px,100%)}
-  .quest-stage{min-height:250px}
-  .hero{transform:scale(.75);margin-bottom:5px}
-  .idle-content,.quest-content,.complete-content{padding:16px}
-}
-
-@media(max-width:679px){
-  .controls.active{grid-template-columns:1fr 1fr 1fr}
-  .game-btn{font-size:7px;padding:7px 5px}
-  .window-date{display:none}
-}
-@media(max-width:390px){
-  .app{padding-left:7px;padding-right:7px}
-  .hud{gap:4px}
-  .hud-card{padding:6px 4px;min-height:50px}
-  .hud-value{font-size:9px}
-  .quest-text{font-size:20px}
-  .idle-copy{font-size:10px}
-  .game-btn{min-height:39px;font-size:6.5px}
-}
-@media(max-height:740px){
-  .topbar{margin-bottom:5px}
-  .hud{margin-bottom:5px}
-  .xp-panel{margin-bottom:5px}
-  .quest-window{padding:6px}
-  .window-bar{margin-bottom:4px}
-  .hero{margin-bottom:4px;transform:scale(.68)}
-  .idle-content,.quest-content,.complete-content{padding:6px}
-  .idle-copy{line-height:1.35}
-  .press-start{display:none}
-  .quest-text{font-size:clamp(17px,5vw,24px)}
-}
-@media(max-height:650px){
-  .hud-card{min-height:45px}
-  .hud-label{font-size:5px}
-  .hud-value{margin-top:3px;font-size:8.5px}
-  .xp-panel{padding:4px 6px}
-  .xp-row{margin-bottom:2px}
-  .window-bar{min-height:25px}
-  .hero{display:none}
-  .idle-copy br{display:none}
-  .game-btn{min-height:36px;padding:6px}
-}
-
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation:none!important;transition:none!important}
-}
-
-.settings-credit{
-    width:100%;
-    text-align:center;
-    margin-top:6px;
-    margin-bottom:2px;
-    font-size:9px;
-    line-height:1.2;
-    opacity:.45;
-    user-select:none;
-}
-.settings-credit a{
-    color:#9d97be;
-    text-decoration:none;
-    transition:.2s;
-}
-.settings-credit a:hover{
-    color:#ffd76a;
-    opacity:1;
-}
-.settings-credit a:visited{
-    color:#9d97be;
-}
-@media (max-width:430px){
-    .settings-credit{
-        font-size:8px;
-        margin-top:4px;
-        margin-bottom:1px;
-    }
-}
-
-</style>
-
-<style id="mobile-readable-patch">
-@media(max-width:679px){
-  .brand-title{
-    font-size:clamp(15px,4.7vw,20px)!important;
-    line-height:1.25!important;
-  }
-
-  .logo-mark{
-    width:44px!important;
-    height:44px!important;
-    font-size:22px!important;
-  }
-
-  .icon-btn{
-    width:44px!important;
-    height:44px!important;
-    font-size:19px!important;
-  }
-
-  .hud{
-    grid-template-columns:repeat(4,1fr)!important;
-    gap:5px!important;
-  }
-
-  .hud-card{
-    min-height:58px!important;
-    padding:7px 5px!important;
-  }
-
-  .hud-label{
-    font-size:7px!important;
-    line-height:1.3!important;
-    white-space:nowrap;
-  }
-
-  .hud-value{
-    font-size:14px!important;
-    margin-top:6px!important;
-    line-height:1.15!important;
-  }
-
-  .xp-row{
-    font-size:12px!important;
-  }
-
-  .xp-track{
-    height:14px!important;
-  }
-
-  .window-title{
-    font-size:8px!important;
-    letter-spacing:.02em;
-  }
-
-  .quest-kicker{
-    font-size:8px!important;
-    padding:6px 8px!important;
-  }
-
-  .quest-text{
-    font-size:clamp(26px,7vw,36px)!important;
-    line-height:1.45!important;
-    padding:0 4px;
-  }
-
-  .quest-reward{
-    font-size:9px!important;
-    margin-top:14px!important;
-  }
-
-  .idle-title{
-    font-size:clamp(14px,4.2vw,19px)!important;
-  }
-
-  .idle-copy{
-    font-size:13px!important;
-    line-height:1.5!important;
-  }
-
-  .complete-title{
-    font-size:clamp(16px,5vw,22px)!important;
-  }
-
-  .complete-copy{
-    font-size:13px!important;
-  }
-
-  .game-btn{
-    min-height:48px!important;
-    font-size:10px!important;
-    line-height:1.35!important;
-    padding:10px 5px!important;
-  }
-}
-
-@media(max-width:390px){
-  .brand-title{font-size:14px!important}
-  .hud-label{font-size:6.3px!important}
-  .hud-value{font-size:12px!important}
-  .quest-text{font-size:25px!important}
-  .game-btn{font-size:8.5px!important}
-}
-
-@media(max-height:740px){
-  .quest-text{
-    font-size:clamp(24px,6.5vw,32px)!important;
-  }
-  .hud-card{
-    min-height:54px!important;
-  }
-  .game-btn{
-    min-height:44px!important;
-  }
-}
-
-@media(max-height:650px){
-  .brand-title{font-size:13px!important}
-  .hud-label{font-size:5.8px!important}
-  .hud-value{font-size:11px!important}
-  .quest-text{font-size:23px!important}
-  .quest-kicker{font-size:7px!important}
-  .quest-reward{font-size:8px!important}
-  .game-btn{min-height:40px!important;font-size:8px!important}
-}
-</style>
-
-
-<style id="button-text-large-patch">
-@media(max-width:679px){
-  .game-btn{
-    min-height:56px!important;
-    font-family:"Noto Sans TC",system-ui,sans-serif!important;
-    font-size:16px!important;
-    font-weight:900!important;
-    line-height:1.15!important;
-    letter-spacing:.02em!important;
-    padding:10px 4px!important;
-    white-space:nowrap!important;
-  }
-}
-@media(max-width:390px){
-  .game-btn{
-    min-height:54px!important;
-    font-size:14px!important;
-    padding:9px 3px!important;
-  }
-}
-@media(max-height:700px){
-  .game-btn{
-    min-height:50px!important;
-    font-size:14px!important;
-  }
-}
-@media(max-height:620px){
-  .game-btn{
-    min-height:46px!important;
-    font-size:13px!important;
-  }
-}
-</style>
-
+<!-- 樣式 -->
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- 背景星空（純裝飾） -->
 <div class="sky" aria-hidden="true">
   <i class="star" style="left:8%;top:10%"></i><i class="star" style="left:18%;top:23%"></i>
   <i class="star" style="left:31%;top:8%"></i><i class="star" style="left:45%;top:19%"></i>
@@ -552,6 +22,8 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:4px}
 </div>
 
 <main class="app">
+
+  <!-- 頂部品牌列 -->
   <header class="topbar">
     <div class="brand">
       <div class="logo-mark">⚔</div>
@@ -563,6 +35,7 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:4px}
     <button class="icon-btn" id="soundBtn" aria-label="切換音效" title="切換音效">🔊</button>
   </header>
 
+  <!-- 玩家狀態 HUD -->
   <section class="hud" aria-label="玩家狀態">
     <div class="hud-card">
       <div class="hud-label">PLAYER LEVEL</div>
@@ -586,6 +59,7 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:4px}
     </div>
   </section>
 
+  <!-- EXP 進度條 -->
   <section class="xp-panel">
     <div class="xp-row">
       <span>EXP</span>
@@ -594,6 +68,7 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:4px}
     <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
   </section>
 
+  <!-- 任務視窗 -->
   <section class="quest-window">
     <div class="window-bar">
       <div class="window-title">QUEST BOARD // 任務佈告欄</div>
@@ -604,6 +79,7 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:4px}
       <div class="mountains"></div>
       <div class="ground"></div>
 
+      <!-- 待機畫面 -->
       <div class="idle-content" id="idleContent">
         <div class="hero" aria-hidden="true">
           <i class="hair"></i><i class="head"></i><i class="cape"></i><i class="body"></i>
@@ -614,12 +90,14 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:4px}
         <div class="idle-copy press-start">PRESS START</div>
       </div>
 
+      <!-- 任務進行中畫面 -->
       <div class="quest-content" id="questContent" hidden>
         <div class="quest-kicker">NEW SIDE QUEST</div>
         <div class="quest-text" id="questText"></div>
         <div class="quest-reward">REWARD +25 EXP</div>
       </div>
 
+      <!-- 任務完成畫面 -->
       <div class="complete-content" id="completeContent" hidden>
         <div class="complete-burst">✨</div>
         <div class="complete-title">QUEST COMPLETE!</div>
@@ -627,23 +105,22 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:4px}
       </div>
     </div>
 
+    <!-- 操作按鈕 -->
     <div class="controls" id="controls">
       <button class="game-btn primary" id="acceptBtn">接任務</button>
       <button class="game-btn blue" id="rerollBtn" hidden>重新抽取</button>
       <button class="game-btn green" id="completeBtn" hidden>完成任務</button>
       <button class="game-btn dark" id="cancelBtn" hidden>稍後再做</button>
     </div>
-  
-<div class="settings-credit">
-    <a href="https://www.threads.com/@bbbeeennnhk"
-       target="_blank"
-       rel="noopener noreferrer">
-       由 Threads @bbbeeennhk 製作
-    </a>
-</div>
 
-</section>
+    <div class="settings-credit">
+      <a href="https://www.threads.com/@bbbeeennhk" target="_blank" rel="noopener noreferrer">
+        由 Threads @bbbeeennhk 製作
+      </a>
+    </div>
+  </section>
 
+  <!-- 歷程卡片（寬螢幕 / 未來擴充用，預設隱藏以確保無捲動） -->
   <section class="bottom-grid">
     <article class="info-card">
       <div class="info-title">7-DAY ADVENTURE LOG</div>
@@ -659,8 +136,10 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:4px}
   <footer class="footer">進度只儲存在目前裝置 · 無需註冊 · 支援離線開啟</footer>
 </main>
 
+<!-- 提示訊息 -->
 <div class="toast" id="toast">QUEST COMPLETE +25 EXP</div>
 
+<!-- 升級彈窗 -->
 <div class="level-up" id="levelUp" hidden>
   <div class="level-box">
     <div class="big">🏆</div>
@@ -670,165 +149,9 @@ button:focus-visible{outline:4px solid var(--blue);outline-offset:4px}
   </div>
 </div>
 
-<script>
-const QUESTS = ["今天回家時，改走一條平時不會走的路。", "找一個安靜的位置，看天空五分鐘。", "進入一間你未曾到過的小店逛一圈。", "在附近散步十分鐘，找出三個以前沒留意的細節。", "找一張長椅坐下，觀察周圍的人與聲音五分鐘。", "去一個你平時只會路過的地方停留片刻。", "嘗試用不同交通方式完成一小段路程。", "在住處附近找一條從未走過的小巷。", "找一個能看到日落的位置，安靜欣賞。", "選一個附近地標，今天親自走到那裡。", "到一間書店或圖書館，隨機翻閱一本書。", "走進一間你未試過的咖啡店，點一杯簡單飲品。", "在一個熟悉的地方，用遊客角度重新逛一次。", "今天留意五個不同形狀的招牌。", "找出附近最安靜的一條街。", "在公園走一圈，不戴耳機。", "拍下一個平日容易忽略的美麗細節。", "找一棵你覺得特別的樹，觀察它一分鐘。", "去便利店挑一款從未試過的飲品。", "到附近市場看看三種不熟悉的食材。", "選一個車站，提早一站下車再步行。", "到戶外找一個舒服的位置閱讀十分鐘。", "探索住處附近半徑五百米內的新地方。", "找出一個適合獨處的秘密角落。", "在白天與晚上各觀察同一條街一次。", "今天走路時，只留意建築物的窗戶。", "找一個有水景的地方停留五分鐘。", "去一間從未光顧的小店買一件實用小物。", "在熟悉的商場找出一間以前沒注意的店。", "今天不看導航，憑方向感走一小段熟悉區域。", "寫下今天最值得感謝的一件小事。", "用三句話記錄今天的心情。", "寫下最近令你感到安心的一個地方。", "列出三件你已經做得不錯的事情。", "寫一句給明天自己的鼓勵。", "關掉通知十分鐘，專心做一件事。", "慢慢喝完一杯水，期間不看手機。", "做五次緩慢深呼吸，留意身體感覺。", "整理桌面上五件物品。", "刪除手機內十張不需要的截圖。", "清理一個小抽屜。", "把明天最重要的一件事寫在紙上。", "寫下最近想學的一項小技能。", "回想今天一個讓你微笑的瞬間。", "記錄今天遇到的一個有趣細節。", "為今天取一個電影名稱。", "寫下最近最常出現的一個想法。", "列出三件能讓你恢復精神的小事。", "花五分鐘甚麼也不做，只觀察呼吸。", "睡前把手機放遠五分鐘。", "把房間內一個角落整理得更舒服。", "選一件拖延已久、五分鐘內能完成的小事。", "寫下今天你勇敢面對的一件事。", "記錄一個你想再次體驗的時刻。", "寫下最近一次被幫助的經歷。", "為自己安排十五分鐘的安靜時間。", "今天少說一次自我批評的話。", "把一個煩惱改寫成可以行動的小問題。", "寫下目前生活中已經擁有的五樣東西。", "在鏡子前對自己說一句真誠的支持。", "真誠稱讚一個人。", "傳訊息問候一位最近少聯絡的朋友。", "向店員清楚地說一聲謝謝。", "主動替身邊的人做一件小事。", "問一位朋友今天過得怎樣，並認真聆聽。", "分享一首最近喜歡的歌曲給朋友。", "把一張有趣的照片傳給能理解它的人。", "向家人說一件你欣賞他的地方。", "回覆一則拖延已久的訊息。", "向一位朋友推薦一本書、電影或餐廳。", "和熟悉的店員多說一句友善的話。", "寫一張簡短紙條感謝某人。", "主動邀請朋友一起散步。", "今天讓一次路，並保持耐心。", "幫助一個人完成很小的事情。", "告訴一位朋友你最近想到他。", "把一個實用資訊分享給需要的人。", "向一位長輩請教一件人生經驗。", "和家人一起吃一餐不看手機。", "向某人說出一個真誠而具體的稱讚。", "主動問候鄰居或同事。", "傳一個語音訊息給很久沒聯絡的人。", "請一位朋友推薦一樣他最近喜歡的東西。", "為身邊的人準備一杯水或飲品。", "把座位或通道讓給更需要的人。", "今天對五個人微笑或點頭示意。", "找一個機會說出『辛苦了』。", "和朋友分享今天發生的一件小事。", "主動向一個曾幫助你的人表達感謝。", "邀請家人一起完成一件簡單家務。", "隨手畫一幅只用線條組成的小畫。", "用手機拍攝五張同一顏色的照片。", "寫一個只有一百字的短故事。", "為今天製作一張四首歌的播放清單。", "用紙摺一件簡單作品。", "替房間內一件物品設計新名字。", "用三種家中現有食材做一份小食。", "拍一張像電影畫面的日常照片。", "寫一段一分鐘可以讀完的旁白。", "用五個隨機詞語寫一段小故事。", "把一張舊照片重新配上一句文字。", "畫出你理想中的秘密基地。", "設計一個屬於自己的像素角色。", "為一種情緒選一首主題曲。", "寫一張虛構明信片給未來的自己。", "用家中物品砌出一個小雕塑。", "嘗試畫一幅不抬筆的圖畫。", "為今天遇到的人設計一個遊戲角色稱號。", "寫下十個奇怪但有趣的故事開頭。", "製作一杯外觀特別的飲品。", "用手機錄下一分鐘的生活片段。", "重新排列書桌，令它更像工作站。", "為自己的房間設計一個像素地圖。", "用六張照片記錄今天。", "嘗試寫四行短詩。", "把普通早餐擺盤得像咖啡店餐點。", "為一件舊物想出三種新用途。", "畫一張今天心情的天氣圖。", "用紙筆設計一張虛構遊戲卡。", "錄下三十秒環境聲，替它取一個名字。", "學會一個簡單魔術。", "查清楚一個你一直好奇的小問題。", "看一段十分鐘的科普影片。", "學會用另一種語言說『今天過得好嗎』。", "閱讀一篇你平時不會看的主題文章。", "記住一個新的單字並造句。", "學習一個基本急救知識。", "找出一個常用物品的發明故事。", "了解你所在城市一個地名的由來。", "學會打一個實用的繩結。", "閱讀一位陌生人物的簡短傳記。", "用五分鐘了解一個國家的日常文化。", "學會辨認一種常見植物。", "查閱今天日期曾發生過的一件歷史事件。", "學習一個新的手機快捷操作。", "理解一個你經常聽到卻未弄懂的詞語。", "看一段關於海洋、太空或動物的短片。", "學會一個簡單伸展動作。", "了解一種你從未吃過的食物。", "找一張世界地圖，隨機選一個地方了解五分鐘。", "學習一個簡單記憶技巧。", "找出一項家居用品的正確保養方法。", "閱讀一本書的第一章。", "學會用紙畫一個簡單透視方格。", "了解一位藝術家的代表作品。", "找出一首歌背後的創作故事。", "學習一個常用鍵盤快捷鍵。", "了解一種日常心理偏誤。", "找出一個常見成語的來源。", "學會辨認今晚最容易看到的一顆星或星座。", "今天在需要時清楚表達一次自己的想法。", "主動提出一個小問題。", "獨自到一間咖啡店坐十五分鐘。", "穿上一件平時很少穿的衣服。", "嘗試一款以前不會選的食物。", "在小組對話中主動分享一次意見。", "對一件不合理的小要求禮貌說不。", "完成一件一直害怕做錯的小任務。", "向熟悉的人請教一件你不懂的事。", "在鏡頭前錄一段三十秒自我介紹。", "主動開始一段簡短對話。", "把一件未完成的小作品展示給信任的人。", "嘗試一個新的髮型或配搭。", "獨自完成一次短途散步或用餐。", "報名一個免費線上體驗課。", "今天少逃避一次眼神交流。", "對下一個合理的小邀請說好。", "提出一個你一直想問的問題。", "把一項個人目標告訴可信任的人。", "做一件會讓未來自己感謝的小事。", "關閉美化濾鏡拍一張自然照片。", "用正常音量說出自己的需要。", "在不熟悉的店內主動詢問商品資訊。", "嘗試一件你覺得自己可能不擅長的小事。", "把一個拖延的小決定在今天完成。", "傳出一則你反覆修改很久的普通訊息。", "在公共場合閱讀或寫字十分鐘。", "選一件小事相信自己的第一判斷。", "主動承認一個無傷大雅的小錯誤。", "邀請別人一起做一件簡單活動。", "散步十五分鐘。", "做五分鐘全身伸展。", "今天多喝一杯水。", "站起來活動肩頸三分鐘。", "提早十五分鐘上床休息。", "吃一份新鮮水果。", "完成十次緩慢深蹲。", "到戶外曬一會自然光。", "把其中一段短路程改為步行。", "做一分鐘靠牆站立。", "整理坐姿，維持五分鐘。", "今天少喝一杯含糖飲品。", "慢慢吃完一餐，不邊看影片。", "做三組每組十秒的深呼吸。", "在室內走動五分鐘。", "完成一次溫和的腿部伸展。", "睡前做兩分鐘肩頸放鬆。", "今天吃一種不同顏色的蔬菜。", "為明天準備一瓶水。", "午飯後輕鬆散步五分鐘。", "站在窗邊看看遠處一分鐘。", "做十次抬腳跟。", "今天其中一次搭電梯改走樓梯一層。", "播放一首歌，跟着節奏活動身體。", "閉眼休息兩分鐘。", "做五次緩慢抬手伸展。", "把手機抬高一點，改善低頭姿勢。", "在安全地方赤腳感受地面一分鐘。", "做一次簡單手腕與手指伸展。", "今天安排一段不被打擾的休息時間。", "丟掉或回收五件不再需要的物品。", "整理錢包或手袋。", "清潔手機螢幕與外殼。", "把床鋪整理好。", "更換一張新的手機桌布。", "整理電腦桌面上的十個檔案。", "備份一份重要照片或文件。", "清理雪櫃內一個小區域。", "把一件物品放回它應在的位置。", "整理鞋櫃的一小格。", "清潔一面鏡子。", "替房間換一種燈光氣氛。", "洗一個一直擱置的小物件。", "整理常用充電線。", "把明天要穿的衣服先準備好。", "清除一個不再使用的手機應用程式。", "把一件舊衣重新配搭。", "為家中一個角落增加一點舒適感。", "清理書包或工作袋內的雜物。", "檢查一件常用物品是否需要補充。", "整理相簿中的一個月份。", "把一項固定支出記錄下來。", "為下星期寫一張簡短採購清單。", "把一封重要郵件整理或歸檔。", "擦乾淨一雙常穿的鞋。", "整理浴室內五件用品。", "把一件可修理的小東西修好。", "清潔桌面鍵盤。", "替一盆植物澆水或整理葉片。", "準備明天早餐所需的其中一樣材料。", "嘗試一種以前沒吃過的水果。", "用家中材料做一份簡單三文治。", "為普通飲用水加入一片水果。", "學會煮一種簡單蛋料理。", "在今天一餐加入一種不同顏色的蔬菜。", "找一款陌生國家的小食試試。", "為自己泡一杯慢慢享用的茶。", "親手製作一份簡單甜點。", "把今天其中一餐擺盤得更漂亮。", "嘗試用不同方式烹調一種熟悉食材。", "在超市找一款從未留意的調味料。", "為家人準備一份小食。", "製作一杯無酒精特調飲品。", "學習一道五種材料以內的料理。", "嘗試一款新的麵包或飯糰口味。", "今天細心品嚐第一口食物。", "記錄一道你想再次製作的料理。", "用剩餘食材組合一份簡單餐點。", "找出家中最接近到期的食物並妥善使用。", "嘗試一種不同的早餐組合。", "為一種常吃食物加入新配料。", "選一款季節限定的小食。", "做一份簡單水果碗。", "今天用喜歡的杯子喝飲品。", "查找一道家鄉料理的做法。", "和朋友交換一道簡單食譜。", "用香草或香料提升一份普通餐點。", "嘗試慢慢咀嚼其中一餐。", "替明天準備一份健康小食。", "寫下一份只包含五樣東西的理想早餐。", "把手機設定成專注模式十五分鐘。", "取消追蹤一個讓你感到疲累的帳號。", "整理手機主畫面第一頁。", "把一張喜歡的照片設為桌布。", "刪除十個不再需要的下載檔案。", "為相簿建立一個新的主題資料夾。", "關閉一個不必要的應用程式通知。", "回顧一年前今天拍過的照片。", "找出手機內最早的一張照片。", "把一段喜歡的文字存到筆記。", "製作一張簡單的待辦清單。", "把一個重要聯絡人加入我的最愛。", "整理瀏覽器內五個分頁。", "更新一個過時的帳戶密碼。", "寫下一項本週想減少的數碼習慣。", "把一個常用網站加入書籤。", "將手機放在另一個房間十分鐘。", "找出一個真正有用的免費工具。", "重新命名五個混亂的檔案。", "清理一個聊天群組內的無用媒體。", "把最常用的三個應用程式移到容易找到的位置。", "看完一段已收藏很久的短片。", "刪除一個不再使用的帳號捷徑。", "把今天一段回憶寫進手機備忘錄。", "整理一個雲端資料夾。", "把一則重要訊息加上標記。", "關掉自動播放十分鐘。", "為下一次旅行建立一張靈感清單。", "把一個有價值的網頁分享給朋友。", "檢查手機使用時間，選一個應用程式減少五分鐘。", "在今天找出三個帶有紅色的招牌。", "在今天找出三個帶有紅色的車輛。", "在今天找出三個帶有紅色的衣物。", "在今天找出三個帶有紅色的包裝。", "在今天找出三個帶有藍色的招牌。", "在今天找出三個帶有藍色的車輛。", "在今天找出三個帶有藍色的衣物。", "在今天找出三個帶有藍色的包裝。", "在今天找出三個帶有綠色的招牌。", "在今天找出三個帶有綠色的車輛。", "在今天找出三個帶有綠色的衣物。", "在今天找出三個帶有綠色的包裝。", "在今天找出三個帶有黃色的招牌。", "在今天找出三個帶有黃色的車輛。", "在今天找出三個帶有黃色的衣物。", "在今天找出三個帶有黃色的包裝。", "在今天找出三個帶有白色的招牌。", "在今天找出三個帶有白色的車輛。", "在今天找出三個帶有白色的衣物。", "在今天找出三個帶有白色的包裝。", "在今天找出三個帶有黑色的招牌。", "在今天找出三個帶有黑色的車輛。", "在今天找出三個帶有黑色的衣物。", "在今天找出三個帶有黑色的包裝。", "在今天找出三個帶有橙色的招牌。", "在今天找出三個帶有橙色的車輛。", "在今天找出三個帶有橙色的衣物。", "在今天找出三個帶有橙色的包裝。", "在今天找出三個帶有紫色的招牌。", "在今天找出三個帶有紫色的車輛。", "在今天找出三個帶有紫色的衣物。", "在今天找出三個帶有紫色的包裝。", "在今天找出三個帶有粉紅色的招牌。", "在今天找出三個帶有粉紅色的車輛。", "在今天找出三個帶有粉紅色的衣物。", "在今天找出三個帶有粉紅色的包裝。", "在今天找出三個帶有銀色的招牌。", "在今天找出三個帶有銀色的車輛。", "在今天找出三個帶有銀色的衣物。", "在今天找出三個帶有銀色的包裝。", "花2分鐘安靜聽三種不同的環境聲音。", "花3分鐘安靜聽三種不同的環境聲音。", "花5分鐘安靜聽三種不同的環境聲音。", "花8分鐘安靜聽三種不同的環境聲音。", "花2分鐘留意三種不同的氣味。", "花3分鐘留意三種不同的氣味。", "花5分鐘留意三種不同的氣味。", "花8分鐘留意三種不同的氣味。", "花2分鐘找出三種不同質感的物品。", "花3分鐘找出三種不同質感的物品。", "花5分鐘找出三種不同質感的物品。", "花8分鐘找出三種不同質感的物品。", "花2分鐘觀察同一位置光線的變化。", "花3分鐘觀察同一位置光線的變化。", "花5分鐘觀察同一位置光線的變化。", "花8分鐘觀察同一位置光線的變化。", "花2分鐘留意室內外溫度的差別。", "花3分鐘留意室內外溫度的差別。", "花5分鐘留意室內外溫度的差別。", "花8分鐘留意室內外溫度的差別。", "選出三首讓你想到「童年」的歌曲。", "寫下三個與「童年」有關的詞語。", "拍一張讓你聯想到「童年」的照片。", "選出三首讓你想到「旅行」的歌曲。", "寫下三個與「旅行」有關的詞語。", "拍一張讓你聯想到「旅行」的照片。", "選出三首讓你想到「電影」的歌曲。", "寫下三個與「電影」有關的詞語。", "拍一張讓你聯想到「電影」的照片。", "選出三首讓你想到「夏天」的歌曲。", "寫下三個與「夏天」有關的詞語。", "拍一張讓你聯想到「夏天」的照片。", "選出三首讓你想到「雨天」的歌曲。", "寫下三個與「雨天」有關的詞語。", "拍一張讓你聯想到「雨天」的照片。", "選出三首讓你想到「夜晚」的歌曲。", "寫下三個與「夜晚」有關的詞語。", "拍一張讓你聯想到「夜晚」的照片。", "選出三首讓你想到「城市」的歌曲。", "寫下三個與「城市」有關的詞語。", "拍一張讓你聯想到「城市」的照片。", "選出三首讓你想到「海邊」的歌曲。", "寫下三個與「海邊」有關的詞語。", "拍一張讓你聯想到「海邊」的照片。", "選出三首讓你想到「森林」的歌曲。", "寫下三個與「森林」有關的詞語。", "拍一張讓你聯想到「森林」的照片。", "選出三首讓你想到「未來」的歌曲。", "寫下三個與「未來」有關的詞語。", "拍一張讓你聯想到「未來」的照片。", "在今天找出一個讓你感到舒服的角落。", "留意街上三種不同的腳步聲。", "用五分鐘整理一個常被忽略的小地方。", "替今天完成的一件小事畫上一個星號。", "到窗邊看看天空的顏色。", "找出一件你已經很久沒有使用的物品。", "今天主動多走五百步。", "拍一張只有影子的照片。", "找出附近一個有趣的門牌。", "用一句話形容今天的天氣。", "閱讀一本書的最後一頁。", "找出一首你童年聽過的歌曲。", "用紙寫下三個最近想完成的小目標。", "試着用左手完成一件簡單事情。", "今天吃飯時先放下手機五分鐘。", "找一個地方安靜坐三分鐘。", "把一件常用物品清潔乾淨。", "為明天準備一件會用到的物品。", "主動向一個人說早安或你好。", "重新看看一張很久以前的照片。", "找出今天最喜歡的一種顏色。", "把一個普通物件拍得像商品廣告。", "用十個字描述今天的心情。", "寫下一件你想感謝自己的事情。", "找一個地方看雲五分鐘。", "把房間內一件物品換個位置。", "今天用不同的杯子喝水。", "找出三個圓形物件。", "用一首歌陪自己完成一件小事。", "走路時刻意放慢一分鐘。", "留意今天第一個令你微笑的瞬間。", "把一件簡單家務在五分鐘內完成。", "找出一種你平時忽略的聲音。", "用手機拍下一個有趣的倒影。", "寫下最近學到的一件小知識。", "今天少看一次手機通知。", "把一個舊記事重新閱讀一次。", "找出一個你喜歡的字體或招牌設計。", "為今天選一個代表表情符號。", "喝水前先做三次深呼吸。", "找出一樣令你聯想到夏天的東西。", "用三分鐘整理手機相簿。", "把一件衣服重新配搭一次。", "寫下一句最近最想聽到的話。", "找出附近一個有特色的窗戶。", "今天試一種不同的坐姿。", "主動幫自己完成一件麻煩的小事。", "找出三樣你覺得設計得很好的物品。", "用紙筆畫出今天走過的路線。", "選一張照片，寫下拍攝時的記憶。", "把一件小事做到比平時更仔細。", "今天提早五分鐘準備出門。", "找一個理由稱讚自己的努力。", "觀察一種植物的葉子形狀。", "找出一個以前沒注意的店名。", "寫一個只有一句話的故事。", "用五分鐘整理電子郵件。", "今天試着少說一次抱怨。", "找一個舒服的位置伸展手臂。", "把一件物品送回原本的位置。", "找出一個像遊戲場景的地方。", "今天主動問一個人是否需要幫忙。", "用手機錄下十秒環境聲音。", "寫下最近最想去的一個地方。", "找出三種不同材質的地面。", "今天用不同方式沖一杯飲品。", "把一個待辦事項拆成兩個小步驟。", "找一首適合今天心情的背景音樂。", "觀察一分鐘自己的呼吸節奏。", "整理一個經常打開的抽屜。", "找出一件可以捐出的物品。", "今天把一件事情提早完成。", "拍一張只包含兩種顏色的照片。", "用一句話記錄今天最意外的事情。", "看一段從未看過類型的短片。", "找一個可以看見遠方的位置。", "主動向一位家人分享今天的心情。", "寫下三件希望下星期發生的事情。", "今天嘗試用現金或不同付款方式買一件小東西。", "把手機螢幕亮度調整到舒服的程度。", "留意今天最常出現的顏色。", "找出一個你喜歡的包裝設計。", "用五分鐘學會一個新手勢或小技巧。", "今天試着更慢地完成一件事情。", "把一個舊檔案重新命名整理。", "找出一首沒有歌詞的音樂來聽。", "寫下今天最需要放下的一個想法。", "觀察街上三種不同的表情。", "今天主動整理自己的座位。", "找出一個能讓你感到安心的聲音。", "用一張照片記錄今天的光線。", "為自己的今天打上一個簡單分數。", "找出一件能代表今天的物品。", "嘗試在不看時間的情況下靜坐兩分鐘。", "今天選擇一件較環保的小行動。", "把一個常用密碼提示整理清楚。", "找出一個你喜歡的城市細節。", "為下一餐加入一種新配料。", "寫下一個想在未來學會的技能。", "今天花五分鐘回顧本週完成的事情。", "主動向一位朋友分享一個小發現。", "找出一個讓你聯想到童年的氣味。", "把一張喜歡的圖片設成暫時桌布。", "今天完成一件不需要別人提醒的事情。", "選一首歌，完整聽完而不切換。", "用紙寫下一個最近困擾你的問題。", "找出一個適合拍黑白照片的場景。", "在安全地方閉眼聽環境聲十秒。", "今天對自己說一句有耐性的話。", "把明天第一件要做的事寫下來。"];
-
-const $ = id => document.getElementById(id);
-const state = {
-  done: Number(localStorage.getItem("dsq_done") || localStorage.getItem("sideQuestDone") || 0),
-  xp: Number(localStorage.getItem("dsq_xp") || 0),
-  streak: Number(localStorage.getItem("dsq_streak") || 0),
-  lastDone: localStorage.getItem("dsq_last_done") || "",
-  recent: JSON.parse(localStorage.getItem("dsq_recent") || localStorage.getItem("sideQuestRecent") || "[]"),
-  dates: JSON.parse(localStorage.getItem("dsq_dates") || "[]"),
-  sound: localStorage.getItem("dsq_sound") !== "off",
-  current: -1
-};
-
-const ranks = ["新手旅人","街角探索者","日常冒險家","勇氣收集者","支線獵人","生活開拓者","傳說旅人"];
-
-function todayKey(offset=0){
-  const d = new Date();
-  d.setDate(d.getDate()+offset);
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-}
-function dateDiff(a,b){
-  const A = new Date(a+"T00:00:00");
-  const B = new Date(b+"T00:00:00");
-  return Math.round((B-A)/86400000);
-}
-function levelFromXp(xp){ return Math.floor(xp/100)+1; }
-function rankFromLevel(level){ return ranks[Math.min(ranks.length-1,Math.floor((level-1)/3))]; }
-
-function save(){
-  localStorage.setItem("dsq_done",state.done);
-  localStorage.setItem("dsq_xp",state.xp);
-  localStorage.setItem("dsq_streak",state.streak);
-  localStorage.setItem("dsq_last_done",state.lastDone);
-  localStorage.setItem("dsq_recent",JSON.stringify(state.recent));
-  localStorage.setItem("dsq_dates",JSON.stringify(state.dates));
-  localStorage.setItem("dsq_sound",state.sound ? "on":"off");
-}
-
-function sound(type){
-  if(!state.sound) return;
-  try{
-    const ctx = new (window.AudioContext||window.webkitAudioContext)();
-    const notes = type==="complete" ? [523,659,784] : type==="level" ? [523,659,784,1047] : [392,523];
-    notes.forEach((freq,i)=>{
-      const o=ctx.createOscillator(),g=ctx.createGain();
-      o.type="square";o.frequency.value=freq;
-      g.gain.setValueAtTime(.035,ctx.currentTime+i*.08);
-      g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+i*.08+.12);
-      o.connect(g);g.connect(ctx.destination);
-      o.start(ctx.currentTime+i*.08);o.stop(ctx.currentTime+i*.08+.13);
-    });
-  }catch(e){}
-}
-
-function updateHud(){
-  const level = levelFromXp(state.xp);
-  const xpNow = state.xp%100;
-  $("level").textContent=level;
-  $("doneCount").textContent=state.done;
-  $("streak").textContent=state.streak;
-  $("xpNow").textContent=xpNow;
-  $("xpNeed").textContent=100;
-  $("xpFill").style.width=xpNow+"%";
-  $("rankName").textContent=rankFromLevel(level);
-  $("soundBtn").textContent=state.sound?"🔊":"🔇";
-  renderWeek();
-}
-
-function renderWeek(){
-  const wrap=$("weekLog");wrap.innerHTML="";
-  const completed=new Set(state.dates);
-  for(let i=-6;i<=0;i++){
-    const dot=document.createElement("i");
-    dot.className="log-dot"+(completed.has(todayKey(i))?" done":"");
-    dot.title=todayKey(i);
-    wrap.appendChild(dot);
-  }
-}
-
-function setMode(mode){
-  $("idleContent").hidden=mode!=="idle";
-  $("questContent").hidden=mode!=="quest";
-  $("completeContent").hidden=mode!=="complete";
-  $("acceptBtn").hidden=mode!=="idle";
-  $("rerollBtn").hidden=mode!=="quest";
-  $("completeBtn").hidden=mode!=="quest";
-  $("cancelBtn").hidden=mode!=="quest";
-  $("controls").classList.toggle("active",mode==="quest");
-}
-
-function pickQuest(){
-  const blocked=new Set(state.recent.slice(-35));
-  let idx;
-  do{idx=Math.floor(Math.random()*QUESTS.length)}
-  while((idx===state.current||blocked.has(idx))&&QUESTS.length>36);
-  state.current=idx;
-  state.recent.push(idx);
-  if(state.recent.length>80) state.recent=state.recent.slice(-80);
-  $("questText").textContent=QUESTS[idx];
-  setMode("quest");
-  sound("pick");
-  save();
-}
-
-function completeQuest(){
-  const previousLevel=levelFromXp(state.xp);
-  const today=todayKey();
-
-  if(state.lastDone!==today){
-    if(state.lastDone && dateDiff(state.lastDone,today)===1) state.streak++;
-    else state.streak=1;
-    state.lastDone=today;
-  }
-
-  state.done++;
-  state.xp+=25;
-  if(!state.dates.includes(today)) state.dates.push(today);
-  state.dates=state.dates.slice(-45);
-  save();
-  updateHud();
-  setMode("complete");
-  sound("complete");
-  showToast();
-
-  const nextLevel=levelFromXp(state.xp);
-  setTimeout(()=>{
-    if(nextLevel>previousLevel){
-      $("newLevel").textContent=nextLevel;
-      $("levelUp").hidden=false;
-      sound("level");
-    }else{
-      setMode("idle");
-    }
-  },1050);
-}
-
-function showToast(){
-  $("toast").classList.add("show");
-  setTimeout(()=>$("toast").classList.remove("show"),1350);
-}
-
-$("acceptBtn").addEventListener("click",pickQuest);
-$("rerollBtn").addEventListener("click",pickQuest);
-$("completeBtn").addEventListener("click",completeQuest);
-$("cancelBtn").addEventListener("click",()=>setMode("idle"));
-$("soundBtn").addEventListener("click",()=>{
-  state.sound=!state.sound;save();updateHud();
-  if(state.sound) sound("pick");
-});
-$("levelClose").addEventListener("click",()=>{
-  $("levelUp").hidden=true;setMode("idle");
-});
-
-const now=new Date();
-$("todayLabel").textContent=new Intl.DateTimeFormat("zh-Hant",{year:"numeric",month:"long",day:"numeric",weekday:"short"}).format(now);
-updateHud();
-setMode("idle");
-</script>
+<!-- 任務資料（純資料，無邏輯） -->
+<script src="quests.js" defer></script>
+<!-- 遊戲邏輯 -->
+<script src="script.js" defer></script>
 </body>
 </html>
